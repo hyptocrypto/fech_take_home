@@ -26,7 +26,7 @@ func processReceiptHandler(store ReceiptStore) http.HandlerFunc {
 
 		rec, err := ParseReceiptJson(r.Body)
 		if err != nil {
-			http.Error(w, "Invalid JSON: "+err.Error(), http.StatusBadRequest)
+			http.Error(w, "The receipt is invalid. Error: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 

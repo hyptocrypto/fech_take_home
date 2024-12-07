@@ -180,7 +180,6 @@ func TestCalculatePoints(t *testing.T) {
 			}
 			points := CalculateReceiptPoints(receipt)
 
-			// Verify the result matches the expected value
 			if points != test.expected {
 				t.Errorf("Test %q failed: expected %d, got %d", test.name, test.expected, points)
 			}

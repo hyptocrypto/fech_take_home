@@ -1,6 +1,8 @@
 package main
 
-import "sync"
+import (
+	"sync"
+)
 
 // Since negative points are not in scope, this represents points that have not been calculated/initialized yet.
 // Other approach is an int pointer, but using the constant negates the need for ugly memory allocations when using a nil int.
