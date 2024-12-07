@@ -48,7 +48,7 @@ func ParseReceiptJson(body io.Reader) (*Receipt, error) {
 		PurchaseTime: parsedTime,
 		Items:        temp.Items,
 		Total:        total,
-		Points:       -1,
+		Points:       UninitializedPoints,
 	}
 
 	return receipt, nil
