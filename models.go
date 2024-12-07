@@ -14,7 +14,7 @@ type Receipt struct {
 }
 
 // Used as a temp for parsing values
-type StringReceipt struct {
+type JsonReceipt struct {
 	Retailer     string `json:"retailer"`
 	PurchaseDate string `json:"purchaseDate"`
 	PurchaseTime string `json:"purchaseTime"`

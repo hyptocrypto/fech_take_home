@@ -22,7 +22,7 @@ const (
 // ParseReceiptJson takes the json string of a receipt and unmarshals it into a struct.
 // This must handle the non-standard time/date format
 func ParseReceiptJson(body io.Reader) (*Receipt, error) {
-	var temp StringReceipt
+	var temp JsonReceipt
 	if err := json.NewDecoder(body).Decode(&temp); err != nil {
 		return nil, err
 	}
@@ -56,6 +56,7 @@ func ParseReceiptJson(body io.Reader) (*Receipt, error) {
 
 // GenerateUUIDForReceipt creates a deterministic UUID for a given receipt.
 // Like a hash, but conforms to UUID
+// NOTE: This is assuming that two identical receipts should be considered as duplicates.
 func GenerateUUIDForReceipt(receipt *Receipt) string {
 	var data []byte
 	data = append(data, []byte(receipt.Retailer)...)
@@ -82,6 +83,7 @@ func CalculateReceiptPoints(r *Receipt) int {
 	return r.Points
 }
 
+// One point for every alphanumeric char in retailer name
 func calculateRetailerPoints(retailer string) int {
 	points := 0
 	for _, ch := range retailer {
@@ -92,19 +94,25 @@ func calculateRetailerPoints(retailer string) int {
 	return points
 }
 
+// 50 points if the total is a round dollar amount with no cents.
+// 25 points if the total is a multiple of 0.25
 func calculateTotalPoints(total float64) int {
 	points := 0
 	if math.Mod(total, 1.0) == 0 {
-		points += 50 // Round dollar amount
+		points += 50
 	}
 	if math.Mod(total, 0.25) == 0 {
-		points += 25 // Multiple of 0.25
+		points += 25
 	}
 	return points
 }
 
+// 5 points for every two items on the receipt
+// If the trimmed length of the item description is a multiple of 3,
+// multiply the price by 0.2 and round up to the nearest integer.
+// The result is the number of points earned.
 func calculateItemPoints(items []Item) int {
-	points := (len(items) / 2) * 5 // 5 points for every two items
+	points := (len(items) / 2) * 5
 
 	for _, item := range items {
 		descriptionLength := len(strings.TrimSpace(item.ShortDescription))
@@ -116,17 +124,19 @@ func calculateItemPoints(items []Item) int {
 	return points
 }
 
+// 6 points if the day in the purchase date is odd
 func calculateDatePoints(purchaseDate time.Time) int {
 	if purchaseDate.Day()%2 != 0 {
-		return 6 // 6 points if the day is odd
+		return 6
 	}
 	return 0
 }
 
+// 10 points if the time of purchase is after 2pm and before 4pm
 func calculateTimePoints(purchaseTime time.Time) int {
 	hour := purchaseTime.Hour()
 	if hour == 14 || (hour == 15 && purchaseTime.Minute() == 0) {
-		return 10 // 10 points for purchases between 2:00 PM and 4:00 PM
+		return 10
 	}
 	return 0
 }
