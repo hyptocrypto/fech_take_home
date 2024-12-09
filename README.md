@@ -1,7 +1,8 @@
 # Abstract
 
-Simple Go application to process receipts. <br/>
-Designed to fulfill specs outlined in the [fetch take home assessment]("https://github.com/fetch-rewards/receipt-processor-challenge?tab=readme-ov-file")
+This is a Go application to process receipts. <br/>
+Designed to fulfill specs outlined in the [fetch take home assessment]("https://github.com/fetch-rewards/receipt-processor-challenge?tab=readme-ov-file").
+The implementation is intended to be as simple as possible while fulfilling the requirements. No scope creep.
 
 # Run
 
