@@ -6,52 +6,21 @@ import (
 	"fmt"
 	"io"
 	"math"
-	"strconv"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-const (
-	RecNameSpace = "123e4567-e89b-12d3-a456-426614174000"
-	dateFormat   = "2006-01-02"
-	timeFormat   = "15:04"
-)
+const RecNameSpace = "123e4567-e89b-12d3-a456-426614174000"
 
 // ParseReceiptJson takes the json string of a receipt and unmarshals it into a struct.
-// This must handle the non-standard time/date format
 func ParseReceiptJson(body io.Reader) (*Receipt, error) {
-	var temp JsonReceipt
-	if err := json.NewDecoder(body).Decode(&temp); err != nil {
+	var r Receipt
+	if err := json.NewDecoder(body).Decode(&r); err != nil {
 		return nil, err
 	}
-
-	parsedDate, err := time.Parse(dateFormat, temp.PurchaseDate)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing date: %w", err)
-	}
-
-	parsedTime, err := time.Parse(timeFormat, temp.PurchaseTime)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing time: %w", err)
-	}
-
-	total, err := strconv.ParseFloat(temp.Total, 64)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing total: %w", err)
-	}
-
-	receipt := &Receipt{
-		Retailer:     temp.Retailer,
-		PurchaseDate: parsedDate,
-		PurchaseTime: parsedTime,
-		Items:        temp.Items,
-		Total:        total,
-		Points:       UninitializedPoints,
-	}
-
-	return receipt, nil
+	return &r, nil
 }
 
 // GenerateUUIDForReceipt creates a deterministic UUID for a given receipt.
@@ -125,7 +94,7 @@ func calculateItemPoints(items []Item) int {
 }
 
 // 6 points if the day in the purchase date is odd
-func calculateDatePoints(purchaseDate time.Time) int {
+func calculateDatePoints(purchaseDate DateTime) int {
 	if purchaseDate.Day()%2 != 0 {
 		return 6
 	}
@@ -133,7 +102,7 @@ func calculateDatePoints(purchaseDate time.Time) int {
 }
 
 // 10 points if the time of purchase is after 2pm and before 4pm
-func calculateTimePoints(purchaseTime time.Time) int {
+func calculateTimePoints(purchaseTime DateTime) int {
 	hour := purchaseTime.Hour()
 	if hour == 14 || (hour == 15 && purchaseTime.Minute() == 0) {
 		return 10

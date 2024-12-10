@@ -1,25 +1,40 @@
 package main
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
-type Receipt struct {
-	Retailer     string    `json:"retailer"`
-	PurchaseDate time.Time `json:"purchaseDate"`
-	PurchaseTime time.Time `json:"purchaseTime"`
-	Items        []Item    `json:"items"`
-	Total        float64   `json:"total"`
-	Points       int       `json:"points"`
+const (
+	dateFormat = "2006-01-02"
+	timeFormat = "15:04"
+)
+
+type DateTime struct {
+	time.Time
 }
 
-// Used as a temp for parsing values
-type JsonReceipt struct {
-	Retailer     string `json:"retailer"`
-	PurchaseDate string `json:"purchaseDate"`
-	PurchaseTime string `json:"purchaseTime"`
-	Items        []Item `json:"items"`
-	Total        string `json:"total"`
+func (dt *DateTime) UnmarshalJSON(data []byte) error {
+	str := strings.Trim(string(data), `"`)
+	if parsedDate, err := time.Parse(dateFormat, str); err == nil {
+		dt.Time = parsedDate
+		return nil
+	}
+	if parsedTime, err := time.Parse(timeFormat, str); err == nil {
+		dt.Time = parsedTime
+		return nil
+	}
+	return fmt.Errorf("invalid DateTime format: %s", str)
+}
+
+type Receipt struct {
+	Retailer     string   `json:"retailer"`
+	PurchaseDate DateTime `json:"purchaseDate"`
+	PurchaseTime DateTime `json:"purchaseTime"`
+	Items        []Item   `json:"items"`
+	Total        float64  `json:"total,string"`
+	Points       int      `json:"points"`
 }
 
 type Item struct {

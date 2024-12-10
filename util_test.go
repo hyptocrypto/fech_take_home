@@ -7,8 +7,10 @@ import (
 )
 
 func TestGenerateHash(t *testing.T) {
-	date, _ := time.Parse("2006-01-02", "2023-12-06")
-	timeOfPurchase, _ := time.Parse("15:04", "15:30")
+	d, _ := time.Parse(dateFormat, "2023-12-06")
+	date := DateTime{Time: d}
+	ti, _ := time.Parse(timeFormat, "15:30")
+	timeOfPurchase := DateTime{Time: ti}
 
 	receipt1 := &Receipt{
 		Retailer:     "RetailerA",
