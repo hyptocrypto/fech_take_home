@@ -15,6 +15,7 @@ type DateTime struct {
 	time.Time
 }
 
+// Custom json decoder to handle non standard date and time formats
 func (dt *DateTime) UnmarshalJSON(data []byte) error {
 	str := strings.Trim(string(data), `"`)
 	if parsedDate, err := time.Parse(dateFormat, str); err == nil {
